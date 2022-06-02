@@ -5,20 +5,20 @@ Make with
 
 ### Objectives
 
-*This API aims to return and list all sports parks in France. 
+* This API aims to return and list all sports parks in France. 
 
-*It is only the hidden part of the iceberg, as it is only half of a project called SportDehors 
+* It is only the hidden part of the iceberg, as it is only half of a project called SportDehors 
 (an application allowing a user to search for a sport park nearby).
 
 ### Features
 
 The API can be requested to obtain the following data:
 
-  *Sports parks (objects, coordinates, properties) according to their id
-  *Sports parks (objects, coordinates, properties) according to their equipment types
-  *Sports parks where their point coordinates are in a specified polygon (by entering 2 point coordinates in 2d)
-  *The user profiles of the application
-  *Comments from users of the application
+  * Sports parks (objects, coordinates, properties) according to their id
+  * Sports parks (objects, coordinates, properties) according to their equipment types
+  * Sports parks where their point coordinates are in a specified polygon (by entering 2 point coordinates in 2d)
+  * The user profiles of the application
+  * Comments from users of the application
 
 ```json
 {
