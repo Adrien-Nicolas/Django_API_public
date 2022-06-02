@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import User, Place, Opinion, User_Opinion, Place_Opinion, Presence
+from .models import Spot, User, Place, Opinion, User_Opinion, Place_Opinion, Presence
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
-        fields = ('name', 'address', 'precision', 'population', 'quality')
+        fields = ('name', 'latitude', 'longitude', 'precision', 'population', 'quality')
 
 
 class OpinionSerializer(serializers.ModelSerializer):
@@ -36,5 +36,12 @@ class PresenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Presence
         fields = ('IDuser', 'IDplace', 'date', 'timeStart', 'timeEnd')
+
+
+class SpotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Spot
+        fields = ('__all__')
+
 
 
