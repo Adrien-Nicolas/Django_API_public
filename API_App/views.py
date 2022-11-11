@@ -16,7 +16,9 @@ from rest_framework import status
 #from shapely.geometry import Point, Polygon, MultiPoint
 from django.contrib.gis.geos import Point, Polygon
 from shapely.ops import nearest_points
-from collections import Counter
+from collections import Counter, OrderedDict
+from rest_framework import routers
+
 
 from .serializers import UserSerializer, PlaceSerializer, OpinionSerializer, User_OpinionSerializer, Place_OpinionSerializer, PresenceSerializer, SpotSerializer
 from .models import User, Place, Opinion, User_Opinion, Place_Opinion, Presence, Spot
@@ -46,7 +48,11 @@ class PresenceViewSet(viewsets.ModelViewSet):
     queryset = Presence.objects.all()
     serializer_class = PresenceSerializer
 
+
+
+
 class SpotViewSet(APIView):
+
     
     def get(self, request, format=None,pk=None):
         if pk is not None:
@@ -68,8 +74,8 @@ class SpotViewSet(APIView):
         points = {"coordinates":[],"properties":{},"type":""}
         points_a=[]
         i=0
-        if not pk:
-            return Response({"error":"no id"},status=status.HTTP_400_BAD_REQUEST)
+        '''if not pk:
+            return Response({"error":"no id"},status=status.HTTP_400_BAD_REQUEST)'''
         
         northEastLat = request.GET["northEastLat"]
         northEastLong = request.GET["northEastLong"]
@@ -81,6 +87,7 @@ class SpotViewSet(APIView):
             southWest = Point(float(southWestLong), float(southWestLat))
             northWest = Point(float(southWestLong), float(northEastLat))
             southEast = Point(float(northEastLong), float(southWestLat))
+          
             polygon = Polygon(((northEast.coords[0],northEast.coords[1]), (southWest.coords[0],southWest.coords[1]), (northWest.coords[0],northWest.coords[1]), (southEast.coords[0],southEast.coords[1]), (northEast.coords[0],northEast.coords[1]))) 
 
             pointCoord = Spot.objects.filter(point_coord_spot__within=polygon)
@@ -137,7 +144,6 @@ class SpotViewSet(APIView):
     
 
 
-        
 
       
 

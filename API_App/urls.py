@@ -8,7 +8,6 @@ from . import views
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('apirest/spot/', views.SpotViewSet.as_view()),
-    path('apirest/spot/<int:pk>/', views.SpotViewSet.as_view()),
-
+    path('spots/', views.SpotViewSet.as_view()),
 ]
+
