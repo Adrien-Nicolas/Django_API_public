@@ -18,6 +18,7 @@ from django.contrib.gis.geos import Point, Polygon
 from shapely.ops import nearest_points
 from collections import Counter, OrderedDict
 from rest_framework import routers
+from django.views.generic.base import TemplateView
 
 
 from .serializers import UserSerializer, PlaceSerializer, OpinionSerializer, User_OpinionSerializer, Place_OpinionSerializer, PresenceSerializer, SpotSerializer
@@ -73,6 +74,7 @@ class SpotViewSet(APIView):
     def post(self, request, format=None,pk=None):
         points = {"coordinates":[],"properties":{},"type":""}
         points_a=[]
+        tab_poly=[]
         i=0
         '''if not pk:
             return Response({"error":"no id"},status=status.HTTP_400_BAD_REQUEST)'''
@@ -88,10 +90,15 @@ class SpotViewSet(APIView):
             northWest = Point(float(southWestLong), float(northEastLat))
             southEast = Point(float(northEastLong), float(southWestLat))
           
-            polygon = Polygon(((northEast.coords[0],northEast.coords[1]), (southWest.coords[0],southWest.coords[1]), (northWest.coords[0],northWest.coords[1]), (southEast.coords[0],southEast.coords[1]), (northEast.coords[0],northEast.coords[1]))) 
-
+            polygon = Polygon(((northWest.coords[0],northWest.coords[1]), (northEast.coords[0],northEast.coords[1]),(southEast.coords[0],southEast.coords[1]), (southWest.coords[0],southWest.coords[1]),(northWest.coords[0],northWest.coords[1])))
+            
+            
+            print(polygon)
+            print("____________here_____________")                
             pointCoord = Spot.objects.filter(point_coord_spot__within=polygon)
+            #print(pointCoord)
             kmeans = sklearn.cluster.AffinityPropagation(random_state = 0).fit(pointCoord.values_list('point_coord_spot',flat=True))
+
             labels = kmeans.labels_
 
             cluster_center = kmeans.cluster_centers_
@@ -101,10 +108,11 @@ class SpotViewSet(APIView):
             keys_values = dic_counter_labels.items()
 
             new_dict_counter_labels = {str(key): int(value) for key, value in keys_values}
-
             for key in dic_counter_labels:
                 if dic_counter_labels[key]>1: 
+
                     points["coordinates"]=cluster_center[key]
+                    points["coordinates"][0], points["coordinates"][1] = points["coordinates"][1], points["coordinates"][0]
                     points["properties"]["cluster_id"]=(key)
                     points["properties"]["cluster_size"]=(dic_counter_labels[key])
                     points["type"]="Cluster"
@@ -113,15 +121,19 @@ class SpotViewSet(APIView):
                     index_point = list(labels).index(key)
                     point_object = pointCoord[index_point]
                     points["coordinates"]=point_object.point_coord_spot.coords
+                    reversed(points["coordinates"])
                     points["properties"]["spot_point_id"]=int(point_object.id)
                     points["type_equipement"]=point_object.typequipement
                     points["type"]="Spot_Point"
                     points_a.append(copy.deepcopy(points))
 
-
+            for i in range (len(polygon.coords[0])):
+                long = polygon.coords[0][i][1]
+                lat = polygon.coords[0][i][0]
+                tab_poly.append([long,lat])
+  
             #return Response({'cluster_data':new_dict_counter_labels, 'spots':serializer.data})
-
-            return Response({'Points': points_a})
+            return Response({'Points': points_a, 'Polygon':tab_poly})
         else:
             return Response({"error":"no coords"},status=status.HTTP_400_BAD_REQUEST)
     
@@ -141,6 +153,19 @@ class SpotViewSet(APIView):
         spot = Spot.objects.get(pk=pk)
         spot.delete()
         return Response({"success":"ok"},status=status.HTTP_200_OK)
+
+
+class MarkersMapView(TemplateView):
+    """Markers map view."""
+
+    template_name = "map.html"
+
+    def get_context_data_by_spot_model(self, **kwargs):
+        """Get context data by spot model."""
+        context = super().get_context_data(**kwargs)
+        context["spots"] = Spot.objects.all()
+        return context
+
     
 
 
